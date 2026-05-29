@@ -6,11 +6,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔥 CONEXIÓN A RAILWAY (usa tus datos)
+
 const db = mysql.createConnection({
   host: "zephyr.proxy.rlwy.net",
   user: "root",
-  password: "TU_PASSWORD",
+  password: "NWroHYpEgNGIQNMlUbPTnMiSUxTPvgfS",
   database: "railway",
   port: 16200
 });
@@ -43,6 +43,8 @@ app.get("/productos", (req, res) => {
 });
 
 // SERVER
-app.listen(3000, () => {
-  console.log("Servidor corriendo en puerto 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor corriendo en puerto " + PORT);
 });
