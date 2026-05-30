@@ -47,13 +47,14 @@ app.get("/productos", (req, res) => {
 });
 
 // ==========================================
-// 3. RUTA: AGREGAR PRODUCTO NUEVO (POST)
+// 3. RUTA: AGREGAR PRODUCTO NUEVO (POST) - ACTUALIZADO CON CATEGORÍA
 // ==========================================
 app.post("/productos", (req, res) => {
-  const { nombre, precio, stock, imagen } = req.body;
+  // Aquí ya incluimos la categoria que viene de tu Flutter
+  const { nombre, precio, stock, imagen, categoria } = req.body; 
   db.query(
-    "INSERT INTO productos (nombre, precio, stock, imagen) VALUES (?, ?, ?, ?)",
-    [nombre, precio, stock, imagen],
+    "INSERT INTO productos (nombre, precio, stock, imagen, categoria) VALUES (?, ?, ?, ?, ?)",
+    [nombre, precio, stock, imagen, categoria],
     (err, result) => {
       if (err) return res.json({ success: false, error: err });
       res.json({ success: true, id: result.insertId });
@@ -62,21 +63,20 @@ app.post("/productos", (req, res) => {
 });
 
 // ==========================================
-// 4. RUTA: EDITAR PRODUCTO EXISTENTE (PUT)
+// 4. RUTA: EDITAR PRODUCTO EXISTENTE (PUT) - ACTUALIZADO CON CATEGORÍA
 // ==========================================
 app.put("/productos/:id", (req, res) => {
   const { id } = req.params;
-  const { nombre, precio, stock, imagen } = req.body;
+  const { nombre, precio, stock, imagen, categoria } = req.body;
   db.query(
-    "UPDATE productos SET nombre=?, precio=?, stock=?, imagen=? WHERE id=?",
-    [nombre, precio, stock, imagen, id],
+    "UPDATE productos SET nombre=?, precio=?, stock=?, imagen=?, categoria=? WHERE id=?",
+    [nombre, precio, stock, imagen, categoria, id],
     (err, result) => {
-      if (err) return res.json({ success: false });
+      if (err) return res.json({ success: false, error: err });
       res.json({ success: true });
     }
   );
 });
-
 // ==========================================
 // 5. RUTA: ELIMINAR PRODUCTO (DELETE)
 // ==========================================
