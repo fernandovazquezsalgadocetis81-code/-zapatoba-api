@@ -6,7 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// CONEXIÓN A LA BASE DE DATOS
+// ==========================================
+// CONEXIÓN A LA BASE DE DATOS (RAILWAY)
+// ==========================================
 const db = mysql.createConnection({
   host: "zephyr.proxy.rlwy.net",
   user: "root",
@@ -16,7 +18,7 @@ const db = mysql.createConnection({
 });
 
 // ==========================================
-// 1. RUTA: LOGIN
+// 1. RUTA: LOGIN (INICIO DE SESIÓN)
 // ==========================================
 app.post("/login", (req, res) => {
   const { correo, password } = req.body;
@@ -47,14 +49,13 @@ app.get("/productos", (req, res) => {
 });
 
 // ==========================================
-// 3. RUTA: AGREGAR PRODUCTO NUEVO (POST) - ACTUALIZADO CON CATEGORÍA
+// 3. RUTA: AGREGAR PRODUCTO NUEVO (POST)
 // ==========================================
 app.post("/productos", (req, res) => {
-  // Aquí ya incluimos la categoria que viene de tu Flutter
-  const { nombre, precio, stock, imagen, categoria } = req.body; 
+  const { nombre, precio, imagen, categoria } = req.body; 
   db.query(
-    "INSERT INTO productos (nombre, precio, stock, imagen, categoria) VALUES (?, ?, ?, ?, ?)",
-    [nombre, precio, stock, imagen, categoria],
+    "INSERT INTO productos (nombre, precio, imagen, categoria) VALUES (?, ?, ?, ?)",
+    [nombre, precio, imagen, categoria],
     (err, result) => {
       if (err) return res.json({ success: false, error: err });
       res.json({ success: true, id: result.insertId });
@@ -63,20 +64,21 @@ app.post("/productos", (req, res) => {
 });
 
 // ==========================================
-// 4. RUTA: EDITAR PRODUCTO EXISTENTE (PUT) - ACTUALIZADO CON CATEGORÍA
+// 4. RUTA: EDITAR PRODUCTO EXISTENTE (PUT)
 // ==========================================
 app.put("/productos/:id", (req, res) => {
   const { id } = req.params;
-  const { nombre, precio, stock, imagen, categoria } = req.body;
+  const { nombre, precio, imagen, categoria } = req.body; 
   db.query(
-    "UPDATE productos SET nombre=?, precio=?, stock=?, imagen=?, categoria=? WHERE id=?",
-    [nombre, precio, stock, imagen, categoria, id],
+    "UPDATE productos SET nombre=?, precio=?, imagen=?, categoria=? WHERE id=?",
+    [nombre, precio, imagen, categoria, id],
     (err, result) => {
       if (err) return res.json({ success: false, error: err });
       res.json({ success: true });
     }
   );
 });
+
 // ==========================================
 // 5. RUTA: ELIMINAR PRODUCTO (DELETE)
 // ==========================================
@@ -89,10 +91,9 @@ app.delete("/productos/:id", (req, res) => {
 });
 
 // ==========================================
-// CONFIGURACIÓN DEL SERVIDOR (SIEMPRE VA AL FINAL)
+// CONFIGURACIÓN DEL SERVIDOR
 // ==========================================
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log("Servidor corriendo en puerto " + PORT);
 });
