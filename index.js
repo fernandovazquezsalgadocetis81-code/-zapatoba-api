@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
+// CONEXIÓN A LA BASE DE DATOS
 const db = mysql.createConnection({
   host: "zephyr.proxy.rlwy.net",
   user: "root",
@@ -15,7 +15,9 @@ const db = mysql.createConnection({
   port: 16200
 });
 
-// LOGIN
+// ==========================================
+// 1. RUTA: LOGIN
+// ==========================================
 app.post("/login", (req, res) => {
   const { correo, password } = req.body;
 
@@ -34,7 +36,9 @@ app.post("/login", (req, res) => {
   );
 });
 
-// PRODUCTOS
+// ==========================================
+// 2. RUTA: MOSTRAR PRODUCTOS (GET)
+// ==========================================
 app.get("/productos", (req, res) => {
   db.query("SELECT * FROM productos", (err, results) => {
     if (err) return res.json([]);
@@ -42,7 +46,51 @@ app.get("/productos", (req, res) => {
   });
 });
 
-// SERVER
+// ==========================================
+// 3. RUTA: AGREGAR PRODUCTO NUEVO (POST)
+// ==========================================
+app.post("/productos", (req, res) => {
+  const { nombre, precio, stock, imagen } = req.body;
+  db.query(
+    "INSERT INTO productos (nombre, precio, stock, imagen) VALUES (?, ?, ?, ?)",
+    [nombre, precio, stock, imagen],
+    (err, result) => {
+      if (err) return res.json({ success: false, error: err });
+      res.json({ success: true, id: result.insertId });
+    }
+  );
+});
+
+// ==========================================
+// 4. RUTA: EDITAR PRODUCTO EXISTENTE (PUT)
+// ==========================================
+app.put("/productos/:id", (req, res) => {
+  const { id } = req.params;
+  const { nombre, precio, stock, imagen } = req.body;
+  db.query(
+    "UPDATE productos SET nombre=?, precio=?, stock=?, imagen=? WHERE id=?",
+    [nombre, precio, stock, imagen, id],
+    (err, result) => {
+      if (err) return res.json({ success: false });
+      res.json({ success: true });
+    }
+  );
+});
+
+// ==========================================
+// 5. RUTA: ELIMINAR PRODUCTO (DELETE)
+// ==========================================
+app.delete("/productos/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("DELETE FROM productos WHERE id = ?", [id], (err, result) => {
+    if (err) return res.json({ success: false });
+    res.json({ success: true });
+  });
+});
+
+// ==========================================
+// CONFIGURACIÓN DEL SERVIDOR (SIEMPRE VA AL FINAL)
+// ==========================================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
